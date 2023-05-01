@@ -7,7 +7,8 @@
 
 TESTS = ["(A/\(((!B)/\(C/\D)))/\E)",
          "(A/\(((!B)/\(C/\D))/\E))",
-         "((A\/B)/\((B\/C)/\(F\/D)))"]
+         "((A\/B)/\((B\/C)/\(F\/D)))",
+         "(A/\(((B\/C)\/F)/\K))"]
 
 
 class CheckSCNF:
@@ -87,12 +88,25 @@ class CheckSCNF:
             # проверяем каждую из конституент на грамматику
             for set_index, set in enumerate(constituent_list):
                 if set.count(CheckSCNF.DISJUNCTION) == 1:
-                    if not self.grammar_check(set[set.rfind("("):set.find(")")]):
+                    if not self.grammar_check(set[set.rfind("("):set.find(")")+1]):
                         return False
                 elif set.count(CheckSCNF.DISJUNCTION) > 1:
                     if set_index == len(constituent_list)-1:
-                        if not self.grammar_check(set[set.rfind("("):set.find(")")]):
+                        if not self.grammar_check(set[:-1]):
                             return False
+                    elif set_index == 0:
+                        if not self.grammar_check(set[1:]):
+                            return False
+                    else:
+                        if set.count("(") > set.count(")"):
+                            if not self.grammar_check(set[1:]):
+                                return False
+                        elif set.count("(") < set.count(")"):
+                            if not self.grammar_check(set[:-1]):
+                                return False
+                        else:
+                            if not self.grammar_check(set):
+                                return False
         return True
 
 
